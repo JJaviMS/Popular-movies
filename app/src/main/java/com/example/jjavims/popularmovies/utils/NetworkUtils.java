@@ -19,7 +19,7 @@ import java.util.Scanner;
  * @author JJaviMS
  */
 
-public class NetworkUtils {
+public final class NetworkUtils {
 
     private static final String MOVIES_URL = "https://api.themoviedb.org/3/movie/";
     private static final String API_KEY = "api_key";
@@ -100,6 +100,23 @@ public class NetworkUtils {
             return url;
         } catch (MalformedURLException e) {
             e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Get the server JSON data
+     * @param context The Activity context
+     * @param sortOrder String from the SharedPreferences which indicates the way to sort the data
+     * @return The JSON information from the server
+     * @throws IOException Related to the network connection
+     */
+    public static String getServerResponse (Context context,String sortOrder) throws IOException {
+        if (context.getString(R.string.pref_sort_popularity).equals(sortOrder)){
+            return getHttpResponse(buildUrlWithPopular(context));
+        } else if (context.getString(R.string.pref_sort_top_rated).equals(sortOrder)){
+            return getHttpResponse(buildUrlWithTopRated(context));
+        }else{
             return null;
         }
     }
