@@ -14,8 +14,6 @@ import com.example.jjavims.popularmovies.utils.JSONUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.net.MalformedURLException;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
@@ -29,12 +27,12 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
 
     private JSONObject [] mFilms;
 
-    private Context mContext;
+    private final Context mContext;
 
     public interface FilmAdapterListener {
         void onClick (JSONObject jsonObject);
     }
-    private FilmAdapterListener mFilmAdapterListener;
+    private final FilmAdapterListener mFilmAdapterListener;
 
     FilmAdapter(Context context, FilmAdapterListener filmAdapterListener){
         mContext = context;
@@ -58,7 +56,7 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         JSONObject object = mFilms[position];
         try {
             Glide.with(mContext).load(JSONUtils.getImageURL(object)).into(holder.posterImageView);
-        } catch (JSONException | MalformedURLException e) {
+        } catch (JSONException e) {
             e.printStackTrace();
         }
     }

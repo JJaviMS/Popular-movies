@@ -100,7 +100,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     private static class MyAsyncTask extends AsyncTaskLoader<JSONObject[]> {
 
-        private JSONObject [] mData;
         MyAsyncTask(@NonNull Context context) {
             super(context);
         }
@@ -128,7 +127,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
         @Override
         public void deliverResult(@Nullable JSONObject[] data) {
-            mData =data;
             super.deliverResult(data);
         }
     }
