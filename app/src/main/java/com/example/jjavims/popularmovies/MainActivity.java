@@ -14,6 +14,8 @@ import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.LinearLayout;
 
 import com.example.jjavims.popularmovies.data.MoviesPrefSync;
 import com.example.jjavims.popularmovies.utils.JSONUtils;
@@ -36,6 +38,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @BindView(R.id.recycle_view_poster)
     RecyclerView mRecyclerView;
+    @BindView(R.id.no_data_layout)
+    LinearLayout mLinearLayout;
     private FilmAdapter mFilmAdapter;
 
     @Override
@@ -86,7 +90,23 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onLoadFinished(Loader loader, JSONObject[] data) {
-        mFilmAdapter.setFilms(data);
+        if (data==null){
+            showEmpty();
+        }else{
+            showData();
+            mFilmAdapter.setFilms(data);
+        }
+
+    }
+
+    private void showData() {
+        mLinearLayout.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.VISIBLE);
+    }
+
+    private void showEmpty() {
+        mLinearLayout.setVisibility(View.VISIBLE);
+        mRecyclerView.setVisibility(View.GONE);
     }
 
     @Override
