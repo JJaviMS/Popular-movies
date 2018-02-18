@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
 
     private final int LOADER_ID = 564; //ID for the Loader
+    public static final String INTENT_RAW_DATA_NAME = "Data";
 
     @BindView(R.id.recycle_view_poster)
     RecyclerView mRecyclerView;
@@ -95,7 +96,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void onClick(JSONObject jsonObject) {
-
+        Intent intent = new Intent(this,DetailActivity.class);
+        intent.putExtra(INTENT_RAW_DATA_NAME, jsonObject.toString());
+        startActivity(intent);
     }
 
     private static class MyAsyncTask extends AsyncTaskLoader<JSONObject[]> {

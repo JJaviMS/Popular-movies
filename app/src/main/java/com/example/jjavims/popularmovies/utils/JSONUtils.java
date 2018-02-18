@@ -39,9 +39,9 @@ public class JSONUtils {
         String VOTES = "vote_average";
         String REALESE_DATE = "release_date";
         String TITLE = "title";
-        return film.getString(TITLE) + "\n" +
-                film.getString(OVERVIEW) + "\n" +
-                film.getString(REALESE_DATE) + "\n" +
-                film.getString(VOTES) + "\n";
+        return "Title: " + film.getString(TITLE) + "\n\n" +
+                "Overview: " + film.getString(OVERVIEW) + "\n\n" +
+                "Realise data: " + film.getString(REALESE_DATE) + "\n\n" +
+                "Vote average: " + film.getString(VOTES) + "\n\n";
     }
 }
