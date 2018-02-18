@@ -36,7 +36,7 @@ public class JSONUtils {
 
     public static String getImageURL (JSONObject film) throws JSONException, MalformedURLException {
         String path = film.getString(POSTER_PATH);
-
+        path = new StringBuilder(path).deleteCharAt(0).toString();
         return NetworkUtils.getImageURL(path);
 
     }

@@ -21,7 +21,7 @@ import java.util.Scanner;
 
 public final class NetworkUtils {
 
-    private static final String MOVIES_URL = "https://api.themoviedb.org/3/movie/";
+    private static final String MOVIES_URL = "https://api.themoviedb.org/3";
     private static final String API_KEY = "api_key";
     private static final String POPULAR = "popular";
     private static final String TOP_RATED = "top_rated";
@@ -43,6 +43,7 @@ public final class NetworkUtils {
             InputStream inputStream = connection.getInputStream();
 
             Scanner scanner = new Scanner(inputStream);
+            scanner.useDelimiter("\\A");
 
             boolean hasInput = scanner.hasNext();
 
@@ -130,7 +131,7 @@ public final class NetworkUtils {
      * @return The Image URL
      * @throws MalformedURLException Related on creating the URL
      */
-    public static String getImageURL(String path) throws MalformedURLException {
+    static String getImageURL(String path) throws MalformedURLException {
         Uri uri = Uri.parse(IMAGE_URL).buildUpon().appendPath(SIZE).appendPath(path).build();
 
         Log.v("URL",uri.toString());

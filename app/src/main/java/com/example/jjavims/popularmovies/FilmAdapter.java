@@ -16,6 +16,7 @@ import org.json.JSONObject;
 import java.net.MalformedURLException;
 
 import butterknife.BindView;
+import butterknife.ButterKnife;
 
 /**
  * Created by JjaviMS on 18/02/2018.
@@ -34,7 +35,7 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
     }
     private FilmAdapterListener mFilmAdapterListener;
 
-    public FilmAdapter (Context context, FilmAdapterListener filmAdapterListener){
+    FilmAdapter(Context context, FilmAdapterListener filmAdapterListener){
         mContext = context;
         mFilmAdapterListener = filmAdapterListener;
     }
@@ -43,7 +44,7 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
     public FilmViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int layoutId = R.layout.poster_layout;
 
-        View view = LayoutInflater.from(mContext).inflate(layoutId,parent);
+        View view = LayoutInflater.from(mContext).inflate(layoutId,parent,false);
 
         view.setFocusable(true);
         return new FilmViewHolder(view);
@@ -65,14 +66,16 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         else return mFilms.length;
     }
 
-    public void setFilms (JSONObject [] films){
+    void setFilms(JSONObject[] films){
         mFilms = films;
+        notifyDataSetChanged();
     }
 
     class FilmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         @BindView(R.id.image_poster)ImageView posterImageView;
-        public FilmViewHolder(View itemView) {
+        FilmViewHolder(View itemView) {
             super(itemView);
+            ButterKnife.bind(this,itemView);
 
             itemView.setOnClickListener(this);
 

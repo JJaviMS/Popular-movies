@@ -9,6 +9,8 @@ import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -22,15 +24,33 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 
-public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<JSONObject[]> {
+import butterknife.BindView;
+import butterknife.ButterKnife;
+
+public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks<JSONObject[]>,
+        FilmAdapter.FilmAdapterListener {
 
 
     private final int LOADER_ID = 564; //ID for the Loader
+
+    @BindView(R.id.recycle_view_poster)
+    RecyclerView mRecyclerView;
+    private FilmAdapter mFilmAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        ButterKnife.bind(this);
+
+        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
+
+        mRecyclerView.setLayoutManager(gridLayoutManager);
+        mFilmAdapter = new FilmAdapter(this, this);
+
+        mRecyclerView.setAdapter(mFilmAdapter);
+
+        getSupportLoaderManager().initLoader(LOADER_ID, null, this);
     }
 
     @Override
@@ -57,22 +77,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         switch (id) {
             case LOADER_ID:
                 return new MyAsyncTask(this);
+            default:
+                return null;
 
         }
-        return null;
     }
 
     @Override
     public void onLoadFinished(Loader loader, JSONObject[] data) {
-
+        mFilmAdapter.setFilms(data);
     }
 
     @Override
     public void onLoaderReset(Loader loader) {
+        mFilmAdapter.setFilms(null);
+    }
+
+    @Override
+    public void onClick(JSONObject jsonObject) {
 
     }
 
     private static class MyAsyncTask extends AsyncTaskLoader<JSONObject[]> {
+
+        private JSONObject [] mData;
         MyAsyncTask(@NonNull Context context) {
             super(context);
         }
@@ -87,10 +115,21 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
                 return JSONUtils.getFilmJSON(response);
 
-            } catch (IOException | JSONException e){
+            } catch (IOException | JSONException e) {
                 e.printStackTrace();
                 return null;
             }
+        }
+
+        @Override
+        protected void onStartLoading() {
+            forceLoad();
+        }
+
+        @Override
+        public void deliverResult(@Nullable JSONObject[] data) {
+            mData =data;
+            super.deliverResult(data);
         }
     }
 }
