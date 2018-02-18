@@ -5,7 +5,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.MalformedURLException;
-import java.net.URL;
 
 /**
  * Created by JjaviMS on 17/02/2018.
@@ -35,10 +34,10 @@ public class JSONUtils {
         return results;
     }
 
-    public static URL getImageURL (JSONObject film) throws JSONException, MalformedURLException {
+    public static String getImageURL (JSONObject film) throws JSONException, MalformedURLException {
         String path = film.getString(POSTER_PATH);
 
-        return NetworkUtils.getImagerURL(path);
+        return NetworkUtils.getImageURL(path);
 
     }
 

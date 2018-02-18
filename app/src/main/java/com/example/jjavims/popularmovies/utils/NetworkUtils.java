@@ -124,11 +124,17 @@ public final class NetworkUtils {
         }
     }
 
-    public static URL getImagerURL (String path) throws MalformedURLException {
+    /**
+     * Creates the poster URL to retrieve the image
+     * @param path The image path
+     * @return The Image URL
+     * @throws MalformedURLException Related on creating the URL
+     */
+    public static String getImageURL(String path) throws MalformedURLException {
         Uri uri = Uri.parse(IMAGE_URL).buildUpon().appendPath(SIZE).appendPath(path).build();
 
         Log.v("URL",uri.toString());
-        return new URL(uri.toString());
+        return uri.toString();
     }
 
 }
