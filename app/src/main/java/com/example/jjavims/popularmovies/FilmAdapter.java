@@ -1,6 +1,7 @@
 package com.example.jjavims.popularmovies;
 
 import android.content.Context;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -45,7 +46,9 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         int layoutId = R.layout.poster_layout;
 
         View view = LayoutInflater.from(mContext).inflate(layoutId,parent,false);
-
+        GridLayoutManager.LayoutParams lp = (GridLayoutManager.LayoutParams) view.getLayoutParams();
+        lp.height = parent.getMeasuredHeight()/2;
+        view.setLayoutParams(lp);
         view.setFocusable(true);
         return new FilmViewHolder(view);
     }
@@ -76,7 +79,6 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         FilmViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
-
             itemView.setOnClickListener(this);
 
         }
