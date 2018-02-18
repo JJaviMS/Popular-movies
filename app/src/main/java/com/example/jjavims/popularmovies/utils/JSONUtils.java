@@ -4,6 +4,9 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.net.MalformedURLException;
+import java.net.URL;
+
 /**
  * Created by JjaviMS on 17/02/2018.
  *
@@ -19,18 +22,30 @@ public class JSONUtils {
     private static String REALESE_DATE = "release_date";
     private static String VOTES = "vote_average";
 
-    public static String parseJSON (String rawjSON) throws JSONException {
+    public static JSONObject [] getFilmJSON (String rawjSON) throws JSONException {
 
         JSONObject base = new JSONObject(rawjSON);
 
         JSONArray films = base.getJSONArray(RESULT);
-        String [] results = null;
-        results = new String[films.length()];
+        JSONObject [] results;
+        results = new JSONObject[films.length()];
         for (int i=0;i<films.length();i++){
-            JSONObject film = films.getJSONObject(i);
-            StringBuilder buffer = new StringBuilder();
-
-            buffer.
+            results[i] = films.getJSONObject(i);
         }
+        return results;
+    }
+
+    public static URL getImageURL (JSONObject film) throws JSONException, MalformedURLException {
+        String path = film.getString(POSTER_PATH);
+
+        return NetworkUtils.getImagerURL(path);
+
+    }
+
+    public static String getFilmInformation (JSONObject film) throws JSONException {
+        return film.getString(TITLE) + "\n" +
+                film.getString(OVERVIEW) + "\n" +
+                film.getString(REALESE_DATE) + "\n" +
+                film.getString(VOTES) + "\n";
     }
 }

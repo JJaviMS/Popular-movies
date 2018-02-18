@@ -27,13 +27,16 @@ public final class NetworkUtils {
     private static final String TOP_RATED = "top_rated";
     private static final String MOVIE_PATH = "movie";
 
+    private static final String IMAGE_URL = "http://image.tmdb.org/t/p";
+    private static final String SIZE = "w185";
+
     /**
      * Get the JSON data from the server
      * @param url The URL to fetch the data
      * @return The String containing the JSON information
      * @throws IOException Related to Network reading
      */
-    public static String getHttpResponse (URL url) throws IOException {
+    private static String getHttpResponse(URL url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
         try{
@@ -120,4 +123,12 @@ public final class NetworkUtils {
             return null;
         }
     }
+
+    public static URL getImagerURL (String path) throws MalformedURLException {
+        Uri uri = Uri.parse(IMAGE_URL).buildUpon().appendPath(SIZE).appendPath(path).build();
+
+        Log.v("URL",uri.toString());
+        return new URL(uri.toString());
+    }
+
 }
