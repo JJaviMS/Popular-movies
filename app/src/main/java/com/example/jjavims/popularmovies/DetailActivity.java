@@ -28,13 +28,17 @@ public class DetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_detail);
         ButterKnife.bind(this);
         Intent intentWhichStartedActivity = getIntent();
-        String rawJSON;
-        if (intentWhichStartedActivity!=null){
-            rawJSON = intentWhichStartedActivity.getStringExtra(MainActivity.INTENT_RAW_DATA_NAME);
-        }else{
-            throw new NullPointerException("The rawJSON can not be null");
-        }
+        String rawJSON=null;
+        if (intentWhichStartedActivity != null) {
+            Bundle extras = intentWhichStartedActivity.getExtras();
+            if (extras != null) {
+                if (extras.containsKey(MainActivity.INTENT_RAW_DATA_NAME))
+                    rawJSON = intentWhichStartedActivity.getStringExtra(MainActivity.INTENT_RAW_DATA_NAME);
+            }
 
+        }
+        if (rawJSON==null)
+            throw new NullPointerException("The rawJSON can not be null");
         try {
             JSONObject jsonObject = new JSONObject(rawJSON);
             infoTv.setText(JSONUtils.getFilmInformation(jsonObject));
