@@ -24,6 +24,6 @@ public final class MoviesPrefSync {
 
         String key = context.getResources().getString(R.string.pref_sort_key);
 
-        return sharedPreferences.getString(key,"");
+        return sharedPreferences.getString(key, context.getString(R.string.pref_sort_popularity));
     }
 }

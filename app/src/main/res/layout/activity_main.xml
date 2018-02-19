@@ -30,4 +30,10 @@
             android:layout_height="wrap_content"
             android:text="@string/no_data_to_show"/>
     </LinearLayout>
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:id="@+id/loading_indicator"/>
 </FrameLayout>

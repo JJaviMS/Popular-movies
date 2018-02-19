@@ -16,6 +16,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.example.jjavims.popularmovies.data.MoviesPrefSync;
 import com.example.jjavims.popularmovies.utils.JSONUtils;
@@ -40,6 +41,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     RecyclerView mRecyclerView;
     @BindView(R.id.no_data_layout)
     LinearLayout mLinearLayout;
+    @BindView(R.id.loading_indicator)
+    ProgressBar mProgressBar;
     private FilmAdapter mFilmAdapter;
 
     @Override
@@ -81,6 +84,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public Loader<JSONObject[]> onCreateLoader(int id, Bundle args) {
         switch (id) {
             case LOADER_ID:
+                showLoading();
                 return new MyAsyncTask(this);
             default:
                 return null;
@@ -102,11 +106,13 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     private void showData() {
         mLinearLayout.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.VISIBLE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     private void showEmpty() {
         mLinearLayout.setVisibility(View.VISIBLE);
         mRecyclerView.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.GONE);
     }
 
     @Override
@@ -119,6 +125,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         Intent intent = new Intent(this,DetailActivity.class);
         intent.putExtra(INTENT_RAW_DATA_NAME, jsonObject.toString());
         startActivity(intent);
+    }
+
+    private void showLoading(){
+        mLinearLayout.setVisibility(View.GONE);
+        mRecyclerView.setVisibility(View.GONE);
+        mProgressBar.setVisibility(View.VISIBLE);
     }
 
     private static class MyAsyncTask extends AsyncTaskLoader<JSONObject[]> {
@@ -148,9 +160,5 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             forceLoad();
         }
 
-        @Override
-        public void deliverResult(@Nullable JSONObject[] data) {
-            super.deliverResult(data);
-        }
     }
 }

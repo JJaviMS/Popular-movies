@@ -13,17 +13,18 @@ import org.json.JSONObject;
 public class JSONUtils {
 
     public static JSONObject [] getFilmJSON (String rawjSON) throws JSONException {
+        if (rawjSON!=null) {
+            JSONObject base = new JSONObject(rawjSON);
 
-        JSONObject base = new JSONObject(rawjSON);
-
-        String RESULT = "results";
-        JSONArray films = base.getJSONArray(RESULT);
-        JSONObject [] results;
-        results = new JSONObject[films.length()];
-        for (int i=0;i<films.length();i++){
-            results[i] = films.getJSONObject(i);
-        }
-        return results;
+            String RESULT = "results";
+            JSONArray films = base.getJSONArray(RESULT);
+            JSONObject[] results;
+            results = new JSONObject[films.length()];
+            for (int i = 0; i < films.length(); i++) {
+                results[i] = films.getJSONObject(i);
+            }
+            return results;
+        }else return null;
     }
 
     public static String getImageURL (JSONObject film) throws JSONException {
