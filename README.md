@@ -1,1 +1,1 @@
-To use the app you should add an api_keys.xml and inside it create an string called MOVIEES_API with your API key.
+To use the app you should add the API key into the gradle.properties the key with the next format:  MOVIES_API_KEY = "your_api_key"
