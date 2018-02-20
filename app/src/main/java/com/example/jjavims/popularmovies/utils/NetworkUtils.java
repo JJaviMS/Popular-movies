@@ -6,6 +6,7 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
+import com.example.jjavims.popularmovies.BuildConfig;
 import com.example.jjavims.popularmovies.R;
 
 import java.io.IOException;
@@ -31,6 +32,8 @@ public final class NetworkUtils {
 
     private static final String IMAGE_URL = "http://image.tmdb.org/t/p";
     private static final String SIZE = "w185";
+
+    private static final String MY_API_KEY = BuildConfig.MOVIES_API_KEY;
 
     /**
      * Get the JSON data from the server
@@ -62,22 +65,12 @@ public final class NetworkUtils {
     }
 
     /**
-     * Auxiliar method to get the API key
-     * @param context The app context
-     * @return The API key
-     */
-    private static String getApiKey (Context context){
-        return context.getResources().getString(R.string.MOVIEES_API);
-    }
-
-    /**
      * Creates the URL to fetch movie data sorted by popularity
-     * @param context Context of the app
      * @return URL to fetch the data
      */
-    private static URL buildUrlWithPopular (Context context){
+    private static URL buildUrlWithPopular(){
         Uri movieUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(POPULAR)
-                .appendQueryParameter(API_KEY,getApiKey(context))
+                .appendQueryParameter(API_KEY,MY_API_KEY)
                 .build();
 
         try{
@@ -92,12 +85,11 @@ public final class NetworkUtils {
 
     /**
      * Creates the URL to fetch movie data sorted by top rated
-     * @param context Context of the app
      * @return URL to fetch the data
      */
-    private static URL buildUrlWithTopRated (Context context){
+    private static URL buildUrlWithTopRated(){
         Uri movieUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(TOP_RATED)
-                .appendQueryParameter(API_KEY,getApiKey(context))
+                .appendQueryParameter(API_KEY,MY_API_KEY)
                 .build();
 
         try{
@@ -120,9 +112,9 @@ public final class NetworkUtils {
     public static String getServerResponse (Context context,String sortOrder) throws IOException {
         if (!checkInternetStatus(context)) return null; // If the device is not connected to the Internet just return null
         if (context.getString(R.string.pref_sort_popularity).equals(sortOrder)){
-            return getHttpResponse(buildUrlWithPopular(context));
+            return getHttpResponse(buildUrlWithPopular());
         } else if (context.getString(R.string.pref_sort_top_rated).equals(sortOrder)){
-            return getHttpResponse(buildUrlWithTopRated(context));
+            return getHttpResponse(buildUrlWithTopRated());
         }else{
             return null;
         }
