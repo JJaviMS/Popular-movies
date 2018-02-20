@@ -1,6 +1,8 @@
 package com.example.jjavims.popularmovies.utils;
 
 import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.util.Log;
 
@@ -116,6 +118,7 @@ public final class NetworkUtils {
      * @throws IOException Related to the network connection
      */
     public static String getServerResponse (Context context,String sortOrder) throws IOException {
+        if (!checkInternetStatus(context)) return null; // If the device is not connected to the Internet just return null
         if (context.getString(R.string.pref_sort_popularity).equals(sortOrder)){
             return getHttpResponse(buildUrlWithPopular(context));
         } else if (context.getString(R.string.pref_sort_top_rated).equals(sortOrder)){
@@ -135,6 +138,20 @@ public final class NetworkUtils {
 
         Log.v("URL",uri.toString());
         return uri.toString();
+    }
+
+    /**
+     * Check is the device is connected to the Internet
+     * @param context Context where the app is called
+     * @return Returns true if the device is connected to the Internet, returns null otherwise
+     */
+    private static boolean checkInternetStatus (Context context){
+        ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo status = null;
+        if (connectivityManager != null) {
+            status = connectivityManager.getActiveNetworkInfo();
+        }
+        return status!=null && status.isConnectedOrConnecting();
     }
 
 }
