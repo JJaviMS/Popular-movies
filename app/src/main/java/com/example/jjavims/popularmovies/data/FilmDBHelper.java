@@ -1,8 +1,14 @@
 package com.example.jjavims.popularmovies.data;
 
+import android.app.Activity;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
+import com.example.jjavims.popularmovies.R;
+
+import butterknife.BindString;
+import butterknife.ButterKnife;
 
 /**
  * Created by JjaviMS on 21/02/2018.
@@ -16,28 +22,18 @@ public class FilmDBHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 1;
 
+    @BindString(R.string.pref_sort_popularity)String popularity;
+    @BindString(R.string.pref_sort_top_rated) String topRated;
+
 
     public FilmDBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
+        ButterKnife.bind((Activity) context);
     }
 
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         /*String to create an auxiliary table*/
-        final String SQL_CREATE_SORT_ORDER_TABLE =
-                "CREATE TABLE " + FilmsContract.SortOrderEntry.TABLE_NAME + " ( " +
-                        FilmsContract.SortOrderEntry._ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                        FilmsContract.SortOrderEntry.TYPE_OF_SORT + " TEXT NOT NULL);";
-        /*String to insert in the auxiliary table the row for popularity */
-        final String SQL_INSERT_TYPE_POPULARITY = "INSERT INTO " + FilmsContract.SortOrderEntry.TABLE_NAME + " ( " +
-                FilmsContract.SortOrderEntry.TYPE_OF_SORT + ") VALUES (" + "popularity);";
-        /*String to insert in the auxiliary table the row for top rated */
-        final String SQL_INSERT_TYPE_RATING = "INSERT INTO " + FilmsContract.SortOrderEntry.TABLE_NAME + " ( " +
-                FilmsContract.SortOrderEntry.TYPE_OF_SORT + ") VALUES (" + "top rated);";
-
-        sqLiteDatabase.execSQL(SQL_CREATE_SORT_ORDER_TABLE);
-        sqLiteDatabase.execSQL(SQL_INSERT_TYPE_POPULARITY);
-        sqLiteDatabase.execSQL(SQL_INSERT_TYPE_RATING);
 
         final String SQL_CREATE_FILMS_TABLE =
                 "CREATE TABLE " + FilmsContract.FilmEntry.TABLE_NAME + " ( " +
@@ -50,11 +46,8 @@ public class FilmDBHelper extends SQLiteOpenHelper {
                         be favorite, which means is 0
                          */
                         FilmsContract.FilmEntry.IS_FAVORITE + " TEXT DEFAULT 0,"+
-                        FilmsContract.FilmEntry.TYPE_OF_SORT + " TEXT NOT NULL, "+
-                        /*Assign to the column that is a foreign key of the auxiliary table*/
-                        "FOREIGN KEY ("+ FilmsContract.FilmEntry.TYPE_OF_SORT + ") REFERENCES "+
-                        FilmsContract.SortOrderEntry.TABLE_NAME + " (" +
-                        FilmsContract.SortOrderEntry._ID + "));";
+                        FilmsContract.FilmEntry.TYPE_OF_SORT + " TEXT NOT NULL);";
+
 
 
         sqLiteDatabase.execSQL(SQL_CREATE_FILMS_TABLE);
@@ -63,7 +56,6 @@ public class FilmDBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
-        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FilmsContract.SortOrderEntry.TABLE_NAME);
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + FilmsContract.FilmEntry.TABLE_NAME);
 
         onCreate(sqLiteDatabase);

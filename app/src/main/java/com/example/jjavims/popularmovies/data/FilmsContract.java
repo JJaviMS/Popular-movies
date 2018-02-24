@@ -17,7 +17,12 @@ public class FilmsContract {
 
     public static final String PATH_FILM = "film";
 
-    public static final String PATH_TYPE_OF_SORT = "sort_order";
+    public static final String PATH_SORT = "sort";
+
+    public static final String SORT_PARAM_POPULAR = "popular";
+    public static final String SORT_PARAM_HIGH_RATE = "high_rate";
+
+    public static final String PATH_FAVORITE = "favorite";
 
     public static final class FilmEntry implements BaseColumns{
 
@@ -38,12 +43,4 @@ public class FilmsContract {
         public static final String TYPE_OF_SORT = "type";
     }
 
-
-    public static final class SortOrderEntry implements BaseColumns{
-        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_TYPE_OF_SORT).build();
-
-        public static final String TABLE_NAME = "sort order";
-
-        public static final String TYPE_OF_SORT = "type of sort";
-    }
 }

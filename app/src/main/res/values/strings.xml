@@ -17,4 +17,6 @@
 
     <string name="poster_description">Poster of the film</string>
     <string name="no_data_to_show">No data to show</string>
+
+    <string name="authority">com.example.jjavims.popularmovies</string>
 </resources>
