@@ -7,9 +7,11 @@
 
     <string name="pref_sort_label_top_rated">Top rated</string>
     <string name="pref_sort_label_popularity">Popularity</string>
+    <string name="pref_sort_label_favorite">Favorite</string>
 
     <string name="pref_sort_top_rated" translatable="false">top_rated</string>
     <string name="pref_sort_popularity" translatable="false">popularity</string>
+    <string name="pref_sort_favorite" translatable="false">favorite</string>
 
     <string name="pref_sort_key">sort</string>
 
@@ -19,4 +21,10 @@
     <string name="no_data_to_show">No data to show</string>
 
     <string name="authority">com.example.jjavims.popularmovies</string>
+
+    <string name="refresh">Refresh</string>
+
+    <string name="page_shared_pref" translatable="false">Page</string>
+
+    <string name="error_retrieving_data">Error retrieving data</string>
 </resources>

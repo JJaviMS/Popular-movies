@@ -60,25 +60,25 @@ public class FilmsProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case CODE_POPULAR_FILMS: {
-                cursor = mFilmDBHelper.getWritableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
+                cursor = mFilmDBHelper.getReadableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
                         FilmsContract.FilmEntry.TYPE_OF_SORT + "=?", new String[]{FilmsContract.SORT_PARAM_POPULAR},
                         null, null, sortOrder);
                 break;
             }
             case CODE_HIGH_RATE_FILMS: {
-                cursor = mFilmDBHelper.getWritableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
+                cursor = mFilmDBHelper.getReadableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
                         FilmsContract.FilmEntry.TYPE_OF_SORT + "=?", new String[]{FilmsContract.SORT_PARAM_HIGH_RATE},
                         null, null, sortOrder);
                 break;
             }
             case CODE_FILMS_FAVORITES: {
-                cursor = mFilmDBHelper.getWritableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
+                cursor = mFilmDBHelper.getReadableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
                         FilmsContract.FilmEntry.IS_FAVORITE + "=?", new String[]{String.valueOf(1)},
                         null, null, sortOrder);
                 break;
             }
             case CODE_FILM_ID: {
-                cursor = mFilmDBHelper.getWritableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
+                cursor = mFilmDBHelper.getReadableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
                         FilmsContract.FilmEntry._ID + "=?", new String[]{String.valueOf(uri.getLastPathSegment())},
                         null, null, sortOrder);
                 break;
@@ -107,8 +107,9 @@ public class FilmsProvider extends ContentProvider {
 
         switch (sUriMatcher.match(uri)) {
             case CODE_FILMS: {
-                rowsDeleted = mFilmDBHelper.getWritableDatabase().delete(FilmsContract.FilmEntry.TABLE_NAME, null, null);
-                //Delete all the rows, the unique case I want to delete the rows is to update information
+                rowsDeleted = mFilmDBHelper.getWritableDatabase().delete(FilmsContract.FilmEntry.TABLE_NAME,
+                        FilmsContract.FilmEntry._ID + "=?", new String[]{String.valueOf(0)});
+                //Delete only the not favorites films
                 break;
             }
             default:

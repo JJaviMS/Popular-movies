@@ -1,6 +1,7 @@
 package com.example.jjavims.popularmovies;
 
 import android.content.Context;
+import android.database.Cursor;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -9,10 +10,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
-import com.example.jjavims.popularmovies.utils.JSONUtils;
-
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.example.jjavims.popularmovies.utils.NetworkUtils;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -25,12 +23,12 @@ import butterknife.ButterKnife;
 
 public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder> {
 
-    private JSONObject [] mFilms;
+    private Cursor mFilms;
 
     private final Context mContext;
 
     public interface FilmAdapterListener {
-        void onClick (JSONObject jsonObject);
+        void onClick(int id);
     }
     private final FilmAdapterListener mFilmAdapterListener;
 
@@ -53,21 +51,19 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
 
     @Override
     public void onBindViewHolder(FilmViewHolder holder, int position) {
-        JSONObject object = mFilms[position];
-        try {
-            Glide.with(mContext).load(JSONUtils.getImageURL(object)).into(holder.posterImageView);
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
+        mFilms.moveToPosition(position);
+        String object = mFilms.getString(MainActivity.INDEX_FILM_MOVIE_PATH);
+        String url = NetworkUtils.getImageURL(object);
+        Glide.with(mContext).load(url).into(holder.posterImageView);
     }
 
     @Override
     public int getItemCount() {
         if (mFilms==null) return 0;
-        else return mFilms.length;
+        else return mFilms.getCount();
     }
 
-    void setFilms(JSONObject[] films){
+    void setFilms(Cursor films) {
         mFilms = films;
         notifyDataSetChanged();
     }
@@ -84,7 +80,8 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         @Override
         public void onClick(View view) {
             int position = getAdapterPosition();
-            mFilmAdapterListener.onClick(mFilms[position]);
+            mFilms.moveToPosition(position);
+            mFilmAdapterListener.onClick(mFilms.getInt(MainActivity.INDEX_FILM_MOVIE_ID));
         }
     }
 }

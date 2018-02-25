@@ -29,6 +29,7 @@ public final class NetworkUtils {
     private static final String POPULAR = "popular";
     private static final String TOP_RATED = "top_rated";
     private static final String MOVIE_PATH = "movie";
+    private static final String MOVIE_PAGE_QUERY = "page";
 
     private static final String IMAGE_URL = "http://image.tmdb.org/t/p";
     private static final String SIZE = "w185";
@@ -37,6 +38,7 @@ public final class NetworkUtils {
 
     /**
      * Get the JSON data from the server
+     *
      * @param url The URL to fetch the data
      * @return The String containing the JSON information
      * @throws IOException Related to Network reading
@@ -44,7 +46,7 @@ public final class NetworkUtils {
     private static String getHttpResponse(URL url) throws IOException {
         HttpURLConnection connection = (HttpURLConnection) url.openConnection();
 
-        try{
+        try {
             InputStream inputStream = connection.getInputStream();
 
             Scanner scanner = new Scanner(inputStream);
@@ -52,30 +54,33 @@ public final class NetworkUtils {
 
             boolean hasInput = scanner.hasNext();
 
-            String data =null;
-            if (hasInput){
-                data=scanner.next();
+            String data = null;
+            if (hasInput) {
+                data = scanner.next();
             }
             scanner.close();
             return data;
-        }
-        finally {
+        } finally {
             connection.disconnect();
         }
     }
 
     /**
      * Creates the URL to fetch movie data sorted by popularity
+     *
+     * @param page The page to query
      * @return URL to fetch the data
      */
-    private static URL buildUrlWithPopular(){
+    private static URL buildUrlWithPopular(int page) {
+        if (page < 1) throw new IllegalArgumentException();
         Uri movieUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(POPULAR)
-                .appendQueryParameter(API_KEY,MY_API_KEY)
+                .appendQueryParameter(API_KEY, MY_API_KEY)
+                .appendQueryParameter(MOVIE_PAGE_QUERY, String.valueOf(page))
                 .build();
 
-        try{
+        try {
             URL url = new URL(movieUri.toString());
-            Log.v("URL",url.toString());
+            Log.v("URL", url.toString());
             return url;
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -85,16 +90,20 @@ public final class NetworkUtils {
 
     /**
      * Creates the URL to fetch movie data sorted by top rated
+     *
+     * @param page The page to query
      * @return URL to fetch the data
      */
-    private static URL buildUrlWithTopRated(){
+    private static URL buildUrlWithTopRated(int page) {
+        if (page < 1) throw new IllegalArgumentException();
         Uri movieUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(TOP_RATED)
-                .appendQueryParameter(API_KEY,MY_API_KEY)
+                .appendQueryParameter(API_KEY, MY_API_KEY)
+                .appendQueryParameter(MOVIE_PAGE_QUERY, String.valueOf(page))
                 .build();
 
-        try{
+        try {
             URL url = new URL(movieUri.toString());
-            Log.v("URL",url.toString());
+            Log.v("URL", url.toString());
             return url;
         } catch (MalformedURLException e) {
             e.printStackTrace();
@@ -104,46 +113,54 @@ public final class NetworkUtils {
 
     /**
      * Get the server JSON data
-     * @param context The Activity context
+     *
+     * @param context   The Activity context
      * @param sortOrder String from the SharedPreferences which indicates the way to sort the data
      * @return The JSON information from the server
      * @throws IOException Related to the network connection
      */
-    public static String getServerResponse (Context context,String sortOrder) throws IOException {
-        if (!checkInternetStatus(context)) return null; // If the device is not connected to the Internet just return null
-        if (context.getString(R.string.pref_sort_popularity).equals(sortOrder)){
-            return getHttpResponse(buildUrlWithPopular());
-        } else if (context.getString(R.string.pref_sort_top_rated).equals(sortOrder)){
-            return getHttpResponse(buildUrlWithTopRated());
-        }else{
+    public static String getServerResponse(Context context, String sortOrder, int page) throws IOException {
+        Log.v("Internet connection", "Starting connection");
+        if (!checkInternetStatus(context))
+            return null; // If the device is not connected to the Internet just return null
+        if (context.getString(R.string.pref_sort_popularity).equals(sortOrder)) {
+            return getHttpResponse(buildUrlWithPopular(page));
+        } else if (context.getString(R.string.pref_sort_top_rated).equals(sortOrder)) {
+            return getHttpResponse(buildUrlWithTopRated(page));
+        } else {
             return null;
         }
     }
 
     /**
      * Creates the poster URL to retrieve the image
+     *
      * @param path The image path
      * @return The Image URL
      */
-    static String getImageURL(String path) {
-        Uri uri = Uri.parse(IMAGE_URL).buildUpon().appendPath(SIZE).appendPath(path).build();
+    public static String getImageURL(String path) {
+        StringBuilder builder = new StringBuilder(path);
+        builder.deleteCharAt(0);
+        String postPath = builder.toString();
+        Uri uri = Uri.parse(IMAGE_URL).buildUpon().appendPath(SIZE).appendPath(postPath).build();
 
-        Log.v("URL",uri.toString());
+        Log.v("URL", uri.toString());
         return uri.toString();
     }
 
     /**
      * Check is the device is connected to the Internet
+     *
      * @param context Context where the app is called
      * @return Returns true if the device is connected to the Internet, returns null otherwise
      */
-    private static boolean checkInternetStatus (Context context){
+    public static boolean checkInternetStatus(Context context) {
         ConnectivityManager connectivityManager = (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo status = null;
         if (connectivityManager != null) {
             status = connectivityManager.getActiveNetworkInfo();
         }
-        return status!=null && status.isConnectedOrConnecting();
+        return status != null && status.isConnectedOrConnecting();
     }
 
 }

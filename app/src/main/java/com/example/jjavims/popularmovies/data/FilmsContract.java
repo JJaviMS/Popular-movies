@@ -32,7 +32,7 @@ public class FilmsContract {
 
         public static final String TITLE = "title";
 
-        public static final String RELEASE_DATA = "release date";
+        public static final String RELEASE_DATE = "release_date";
 
         public static final String MOVIE_POSTER_PATH = "poster";
 
@@ -41,6 +41,8 @@ public class FilmsContract {
         public static final String IS_FAVORITE = "favorite";
 
         public static final String TYPE_OF_SORT = "type";
+
+        public static final String VOTE_AVERAGE = "vote_average";
     }
 
 }

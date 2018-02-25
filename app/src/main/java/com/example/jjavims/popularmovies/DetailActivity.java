@@ -6,9 +6,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.bumptech.glide.Glide;
-import com.example.jjavims.popularmovies.utils.JSONUtils;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -41,8 +38,9 @@ public class DetailActivity extends AppCompatActivity {
             throw new NullPointerException("The rawJSON can not be null");
         try {
             JSONObject jsonObject = new JSONObject(rawJSON);
-            infoTv.setText(JSONUtils.getFilmInformation(jsonObject));
-            Glide.with(this).load(JSONUtils.getImageURL(jsonObject)).into(posterIv);
+            //infoTv.setText(JSONUtils.getFilmInformation(jsonObject));
+            //Glide.with(this).load(JSONUtils.getImageURL(jsonObject)).into(posterIv);
+            //TODO Aqui
         } catch (JSONException e) {
             e.printStackTrace();
         }
