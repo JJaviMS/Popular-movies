@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -27,14 +28,20 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
 
     private final Context mContext;
 
+    private BottomReachedListener mBottomReachedListener;
     public interface FilmAdapterListener {
         void onClick(int id);
     }
+
+    public interface BottomReachedListener {
+        void bottomReached(int position);
+    }
     private final FilmAdapterListener mFilmAdapterListener;
 
-    FilmAdapter(Context context, FilmAdapterListener filmAdapterListener){
+    FilmAdapter(Context context, FilmAdapterListener filmAdapterListener, BottomReachedListener bottomReachedListener) {
         mContext = context;
         mFilmAdapterListener = filmAdapterListener;
+        mBottomReachedListener = bottomReachedListener;
     }
 
     @Override
@@ -55,6 +62,10 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         String object = mFilms.getString(MainActivity.INDEX_FILM_MOVIE_PATH);
         String url = NetworkUtils.getImageURL(object);
         Glide.with(mContext).load(url).into(holder.posterImageView);
+        if (position == mFilms.getCount() - 1 && !holder.hasCharged) {
+            mBottomReachedListener.bottomReached(position);
+            holder.hasCharged = true;
+        }
     }
 
     @Override
@@ -66,14 +77,17 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
     void setFilms(Cursor films) {
         mFilms = films;
         notifyDataSetChanged();
+        Log.v("Cursor has chenged", String.valueOf(getItemCount()));
     }
 
     class FilmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+        private boolean hasCharged; //This boolean is to detect if this View has already fetched new data
         @BindView(R.id.image_poster)ImageView posterImageView;
         FilmViewHolder(View itemView) {
             super(itemView);
             ButterKnife.bind(this,itemView);
             itemView.setOnClickListener(this);
+            hasCharged = false;
 
         }
 
@@ -83,5 +97,6 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
             mFilms.moveToPosition(position);
             mFilmAdapterListener.onClick(mFilms.getInt(MainActivity.INDEX_FILM_MOVIE_ID));
         }
+
     }
 }

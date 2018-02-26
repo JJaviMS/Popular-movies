@@ -17,6 +17,7 @@ import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -38,7 +39,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks,
-        FilmAdapter.FilmAdapterListener {
+        FilmAdapter.FilmAdapterListener, FilmAdapter.BottomReachedListener {
 
 
     private final int LOADER_ID_FROM_DATABASE = 564; //ID for the Loader
@@ -78,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
 
         mRecyclerView.setLayoutManager(gridLayoutManager);
-        mFilmAdapter = new FilmAdapter(this, this);
+        mFilmAdapter = new FilmAdapter(this, this, this);
 
         mRecyclerView.setAdapter(mFilmAdapter);
 
@@ -107,6 +108,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 editor.putInt(getString(R.string.page_shared_pref), 1);
                 editor.apply();
+                getContentResolver().delete(FilmsContract.FilmEntry.CONTENT_URI, null, null);
                 getSupportLoaderManager().initLoader(LOADER_ID_GET_NEW_DATA, null, this);
                 return true;
         }
@@ -131,7 +133,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Uri uri = uriBuilder.build();
                 return new CursorLoader(this, uri, FILM_MAIN_PROJECTION, null, null, null);
             case LOADER_ID_GET_NEW_DATA:
-                showLoading();
+                if (args == null)
+                    showLoading();
                 return new MyAsyncTask(this);
             default:
                 return null;
@@ -163,9 +166,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             } else {
                 getContentResolver().bulkInsert(FilmsContract.FilmEntry.CONTENT_URI, cv);
                 changeLoadToDatabase();
-                //getSupportLoaderManager().restartLoader(LOADER_ID_FROM_DATABASE,null,this);
-                //getSupportLoaderManager().initLoader(LOADER_ID_FROM_DATABASE, null, this);
-                //When the data is inserted in the database we try to load the data again
             }
         }
 
@@ -199,6 +199,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         mLinearLayout.setVisibility(View.GONE);
         mRecyclerView.setVisibility(View.GONE);
         mProgressBar.setVisibility(View.VISIBLE);
+    }
+
+    @Override
+    public void bottomReached(int position) {
+        Bundle bundle = new Bundle();
+        Log.v("Main", "Last pos reached");
+        getSupportLoaderManager().initLoader(LOADER_ID_GET_NEW_DATA, bundle, this);
+        mRecyclerView.smoothScrollToPosition(0);
     }
 
     private static class MyAsyncTask extends AsyncTaskLoader<ContentValues[]> {
