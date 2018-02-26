@@ -23,6 +23,8 @@ public class JSONUtils {
         String TITLE = "title";
         String POSTER_PATH = "poster_path";
         String RESULT = "results";
+        String ID = "id";
+        String popularity = "popularity";
         if (rawjSON!=null) {
             JSONObject base = new JSONObject(rawjSON);
 
@@ -38,6 +40,8 @@ public class JSONUtils {
                 cv.put(FilmsContract.FilmEntry.SYNOPSIS, object.getString(OVERVIEW));
                 cv.put(FilmsContract.FilmEntry.MOVIE_POSTER_PATH, object.getString(POSTER_PATH));
                 cv.put(FilmsContract.FilmEntry.TYPE_OF_SORT, sort);
+                cv.put(FilmsContract.FilmEntry._ID, object.getInt(ID));
+                cv.put(FilmsContract.FilmEntry.POPULARITY, object.getDouble(popularity));
                 values[i] = cv;
             }
             return values;

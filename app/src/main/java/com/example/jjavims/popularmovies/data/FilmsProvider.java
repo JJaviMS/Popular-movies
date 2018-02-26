@@ -10,6 +10,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.util.Log;
 
 /**
  * Created by JjaviMS on 24/02/2018.
@@ -62,13 +63,13 @@ public class FilmsProvider extends ContentProvider {
             case CODE_POPULAR_FILMS: {
                 cursor = mFilmDBHelper.getReadableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
                         FilmsContract.FilmEntry.TYPE_OF_SORT + "=?", new String[]{FilmsContract.SORT_PARAM_POPULAR},
-                        null, null, sortOrder);
+                        null, null, FilmsContract.FilmEntry.POPULARITY + " DESC");
                 break;
             }
             case CODE_HIGH_RATE_FILMS: {
                 cursor = mFilmDBHelper.getReadableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
                         FilmsContract.FilmEntry.TYPE_OF_SORT + "=?", new String[]{FilmsContract.SORT_PARAM_HIGH_RATE},
-                        null, null, sortOrder);
+                        null, null, FilmsContract.FilmEntry.VOTE_AVERAGE + " DESC");
                 break;
             }
             case CODE_FILMS_FAVORITES: {
@@ -108,8 +109,9 @@ public class FilmsProvider extends ContentProvider {
         switch (sUriMatcher.match(uri)) {
             case CODE_FILMS: {
                 rowsDeleted = mFilmDBHelper.getWritableDatabase().delete(FilmsContract.FilmEntry.TABLE_NAME,
-                        FilmsContract.FilmEntry._ID + "=?", new String[]{String.valueOf(0)});
+                        FilmsContract.FilmEntry.IS_FAVORITE + "=?", new String[]{String.valueOf(0)});
                 //Delete only the not favorites films
+                Log.v("Rows deleted", String.valueOf(rowsDeleted));
                 break;
             }
             default:

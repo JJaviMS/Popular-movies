@@ -24,6 +24,10 @@ public class FilmsContract {
 
     public static final String PATH_FAVORITE = "favorite";
 
+    public static final String PATH_FILM_TRAILERS = "trailers";
+
+    public static final String PATH_FILM_REVIEWS = "reviews";
+
     public static final class FilmEntry implements BaseColumns{
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FILM).build();
@@ -43,6 +47,30 @@ public class FilmsContract {
         public static final String TYPE_OF_SORT = "type";
 
         public static final String VOTE_AVERAGE = "vote_average";
+
+        public static final String POPULARITY = "popularity";
     }
+
+    public static final class ReviewEntry implements BaseColumns {
+
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FILM_REVIEWS).build();
+
+        public static final String TABLE_NAME = "reviews";
+        public static final String REVIEW = "review";
+        public static final String AUTHOR = "author";
+        public static final String FILM_ID = "film_id";
+    }
+
+    public static final class VideosEntry implements BaseColumns {
+        public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FILM_TRAILERS).build();
+
+        public static final String TABLE_NAME = "trailers";
+        public static final String KEY = "key";
+        public static final String NAME = "name";
+        public static final String FILM_ID = "film_id";
+    }
+
+
+
 
 }
