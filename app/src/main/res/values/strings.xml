@@ -31,4 +31,6 @@
     <string name="vote_average">Vote average:</string>
     <string name="duration">Duration:</string>
     <string name="overview">Overview:</string>
+    <string name="trailers">Trailers</string>
+    <string name="reviews">Reviews</string>
 </resources>
