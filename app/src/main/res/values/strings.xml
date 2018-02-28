@@ -27,4 +27,8 @@
     <string name="page_shared_pref" translatable="false">Page</string>
 
     <string name="error_retrieving_data">Error retrieving data</string>
+    <string name="release_date">Release date:</string>
+    <string name="vote_average">Vote average:</string>
+    <string name="duration">Duration:</string>
+    <string name="overview">Overview:</string>
 </resources>
