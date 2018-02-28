@@ -75,4 +75,12 @@ public class FilmDBHelper extends SQLiteOpenHelper {
 
         onCreate(sqLiteDatabase);
     }
+
+    @Override
+    public void onOpen(SQLiteDatabase db) {
+        super.onOpen(db);
+        if (!db.isReadOnly())
+            //Enable database cascade delete
+            db.setForeignKeyConstraintsEnabled(true);
+    }
 }

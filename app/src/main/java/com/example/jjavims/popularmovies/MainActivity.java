@@ -39,12 +39,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 
 public class MainActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks,
-        FilmAdapter.FilmAdapterListener, FilmAdapter.BottomReachedListener {
+        FilmAdapter.FilmAdapterListener, SharedPreferences.OnSharedPreferenceChangeListener {
 
 
     private final int LOADER_ID_FROM_DATABASE = 564; //ID for the Loader
     private final int LOADER_ID_GET_NEW_DATA = 364;
-    public static final String INTENT_RAW_DATA_NAME = "Data";
+    public static final String FILM_URI = "Data";
 
 
     public static final String[] FILM_MAIN_PROJECTION = {
@@ -79,13 +79,16 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 2, GridLayoutManager.VERTICAL, false);
 
         mRecyclerView.setLayoutManager(gridLayoutManager);
-        mFilmAdapter = new FilmAdapter(this, this, this);
+        mFilmAdapter = new FilmAdapter(this, this);
 
         mRecyclerView.setAdapter(mFilmAdapter);
 
         sortOrder = MoviesPrefSync.getSort(this);
 
         getSupportLoaderManager().initLoader(LOADER_ID_FROM_DATABASE, null, this);
+
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
+        sharedPreferences.registerOnSharedPreferenceChangeListener(this);
     }
 
     @Override
@@ -109,7 +112,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 editor.putInt(getString(R.string.page_shared_pref), 1);
                 editor.apply();
                 getContentResolver().delete(FilmsContract.FilmEntry.CONTENT_URI, null, null);
-                getSupportLoaderManager().initLoader(LOADER_ID_GET_NEW_DATA, null, this);
+                getSupportLoaderManager().restartLoader(LOADER_ID_GET_NEW_DATA, null, this);
                 return true;
         }
         return super.onOptionsItemSelected(item);
@@ -149,8 +152,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             if ((data == null || cursor.getCount() == 0)) {
                 if (NetworkUtils.checkInternetStatus(this) || sortOrder.equals(getString(R.string.pref_sort_favorite))) {
                     //Start to fetch the data
-                    changeLoadToNetwork();
-                    //getSupportLoaderManager().initLoader(LOADER_ID_GET_NEW_DATA, null, this);
+                    getSupportLoaderManager().restartLoader(LOADER_ID_GET_NEW_DATA, null, this);
                 } else {
                     showEmpty();
                 }
@@ -165,7 +167,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 Toast.makeText(this, R.string.error_retrieving_data, Toast.LENGTH_SHORT).show();
             } else {
                 getContentResolver().bulkInsert(FilmsContract.FilmEntry.CONTENT_URI, cv);
-                changeLoadToDatabase();
+                getSupportLoaderManager().restartLoader(LOADER_ID_FROM_DATABASE, null, this);
+
             }
         }
 
@@ -191,7 +194,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     @Override
     public void onClick(int id) {
         Intent intent = new Intent(this, DetailActivity.class);
-        intent.putExtra(INTENT_RAW_DATA_NAME, id);
+        Uri uri = FilmsContract.FilmEntry.buildUriWithId(id);
+        intent.putExtra(FILM_URI, uri);
         startActivity(intent);
     }
 
@@ -203,10 +207,30 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     @Override
     public void bottomReached(int position) {
-        Bundle bundle = new Bundle();
-        Log.v("Main", "Last pos reached");
-        getSupportLoaderManager().initLoader(LOADER_ID_GET_NEW_DATA, bundle, this);
-        mRecyclerView.smoothScrollToPosition(0);
+        if (NetworkUtils.checkInternetStatus(this)) {
+            Bundle bundle = new Bundle();
+            Log.v("Main", "Last pos reached");
+            getSupportLoaderManager().restartLoader(LOADER_ID_GET_NEW_DATA, bundle, this);
+        }
+
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        PreferenceManager.getDefaultSharedPreferences(this).unregisterOnSharedPreferenceChangeListener(this);
+    }
+
+    @Override
+    public void onSharedPreferenceChanged(SharedPreferences sharedPreferences, String s) {
+        sortOrder = sharedPreferences.getString(s, sortOrder);
+        getSupportLoaderManager().restartLoader(LOADER_ID_FROM_DATABASE, null, this);
     }
 
     private static class MyAsyncTask extends AsyncTaskLoader<ContentValues[]> {
@@ -248,16 +272,6 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
             forceLoad();
         }
 
-    }
-
-    private void changeLoadToNetwork() {
-        getSupportLoaderManager().destroyLoader(LOADER_ID_FROM_DATABASE);
-        getSupportLoaderManager().initLoader(LOADER_ID_GET_NEW_DATA, null, this);
-    }
-
-    private void changeLoadToDatabase() {
-        getSupportLoaderManager().destroyLoader(LOADER_ID_GET_NEW_DATA);
-        getSupportLoaderManager().initLoader(LOADER_ID_FROM_DATABASE, null, this);
     }
 
 

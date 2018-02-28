@@ -26,6 +26,14 @@ public class FilmsProvider extends ContentProvider {
     public static final int CODE_FILM_ID = 103;
     public static final int CODE_FILMS_FAVORITES = 104;
 
+    public static final int CODE_TRAILERS = 200;
+    public static final int CODE_TRAILERS_ID = 201;
+    public static final int CODE_TRAILERS_MOVIE_ID = 203;
+
+    public static final int CODE_REVIEWS = 300;
+    public static final int CODE_REVIEWS_ID = 301;
+    public static final int CODE_REVIEWS_MOVIE_ID = 302;
+
 
     private static UriMatcher sUriMatcher = buildURiMatcher();
     private FilmDBHelper mFilmDBHelper;
@@ -42,6 +50,14 @@ public class FilmsProvider extends ContentProvider {
 
         uriMatcher.addURI(authority, FilmsContract.PATH_FILM + "/#", CODE_FILM_ID);
         uriMatcher.addURI(authority, FilmsContract.PATH_FILM + "/" + FilmsContract.PATH_FAVORITE, CODE_FILMS_FAVORITES);
+
+        uriMatcher.addURI(authority, FilmsContract.PATH_FILM_TRAILERS, CODE_TRAILERS);
+        uriMatcher.addURI(authority, FilmsContract.PATH_FILM_TRAILERS + "/#", CODE_TRAILERS_ID);
+        uriMatcher.addURI(authority, FilmsContract.PATH_FILM_TRAILERS + "/" + FilmsContract.PATH_FILM + "/#", CODE_TRAILERS_MOVIE_ID);
+
+        uriMatcher.addURI(authority, FilmsContract.PATH_FILM_REVIEWS, CODE_REVIEWS);
+        uriMatcher.addURI(authority, FilmsContract.PATH_FILM_REVIEWS + "/#", CODE_REVIEWS_ID);
+        uriMatcher.addURI(authority, FilmsContract.PATH_FILM_REVIEWS + "/" + FilmsContract.PATH_FILM + "/#", CODE_TRAILERS_MOVIE_ID);
 
         return uriMatcher;
     }
@@ -82,6 +98,18 @@ public class FilmsProvider extends ContentProvider {
                 cursor = mFilmDBHelper.getReadableDatabase().query(FilmsContract.FilmEntry.TABLE_NAME, projection,
                         FilmsContract.FilmEntry._ID + "=?", new String[]{String.valueOf(uri.getLastPathSegment())},
                         null, null, sortOrder);
+                break;
+            }
+            case CODE_REVIEWS_MOVIE_ID: {
+                cursor = mFilmDBHelper.getWritableDatabase().query(FilmsContract.ReviewEntry.TABLE_NAME, projection,
+                        FilmsContract.ReviewEntry.FILM_ID + "=?", new String[]{String.valueOf(uri.getLastPathSegment())},
+                        null, null, FilmsContract.ReviewEntry._ID + " ASC");
+                break;
+            }
+            case CODE_TRAILERS_MOVIE_ID: {
+                cursor = mFilmDBHelper.getWritableDatabase().query(FilmsContract.VideosEntry.TABLE_NAME, projection,
+                        FilmsContract.VideosEntry.FILM_ID + "=?", new String[]{String.valueOf(uri.getLastPathSegment())},
+                        null, null, FilmsContract.VideosEntry._ID + " ASC");
                 break;
             }
             default:
@@ -161,6 +189,56 @@ public class FilmsProvider extends ContentProvider {
                         ContentResolver contentResolver = context.getContentResolver();
                         if (contentResolver!=null){
                             contentResolver.notifyChange(uri,null);
+                        }
+                    }
+                }
+                break;
+            }
+            case CODE_REVIEWS: {
+                db.beginTransaction();
+                rowsCreated = 0;
+                try {
+                    for (ContentValues cv : values) {
+                        long id = db.insert(FilmsContract.ReviewEntry.TABLE_NAME, null, cv);
+                        if (id != -1) {
+                            rowsCreated++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                if (rowsCreated > 0) {
+                    Context context = getContext();
+                    if (context != null) {
+                        ContentResolver contentResolver = context.getContentResolver();
+                        if (contentResolver != null) {
+                            contentResolver.notifyChange(uri, null);
+                        }
+                    }
+                }
+                break;
+            }
+            case CODE_TRAILERS: {
+                db.beginTransaction();
+                rowsCreated = 0;
+                try {
+                    for (ContentValues cv : values) {
+                        long id = db.insert(FilmsContract.VideosEntry.TABLE_NAME, null, cv);
+                        if (id != -1) {
+                            rowsCreated++;
+                        }
+                    }
+                    db.setTransactionSuccessful();
+                } finally {
+                    db.endTransaction();
+                }
+                if (rowsCreated > 0) {
+                    Context context = getContext();
+                    if (context != null) {
+                        ContentResolver contentResolver = context.getContentResolver();
+                        if (contentResolver != null) {
+                            contentResolver.notifyChange(uri, null);
                         }
                     }
                 }

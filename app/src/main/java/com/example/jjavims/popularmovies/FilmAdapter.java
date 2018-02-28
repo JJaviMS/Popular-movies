@@ -28,20 +28,17 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
 
     private final Context mContext;
 
-    private BottomReachedListener mBottomReachedListener;
+
     public interface FilmAdapterListener {
         void onClick(int id);
-    }
-
-    public interface BottomReachedListener {
         void bottomReached(int position);
     }
+
     private final FilmAdapterListener mFilmAdapterListener;
 
-    FilmAdapter(Context context, FilmAdapterListener filmAdapterListener, BottomReachedListener bottomReachedListener) {
+    FilmAdapter(Context context, FilmAdapterListener filmAdapterListener) {
         mContext = context;
         mFilmAdapterListener = filmAdapterListener;
-        mBottomReachedListener = bottomReachedListener;
     }
 
     @Override
@@ -63,7 +60,7 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         String url = NetworkUtils.getImageURL(object);
         Glide.with(mContext).load(url).into(holder.posterImageView);
         if (position == mFilms.getCount() - 1 && !holder.hasCharged) {
-            mBottomReachedListener.bottomReached(position);
+            mFilmAdapterListener.bottomReached(position);
             holder.hasCharged = true;
         }
     }

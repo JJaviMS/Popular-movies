@@ -72,7 +72,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="25dp"
                     android:layout_marginStart="8dp"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="52dp"
                     android:text="@string/release_date"
                     app:layout_constraintStart_toEndOf="@+id/poster_detail"
                     app:layout_constraintTop_toTopOf="@+id/poster_detail" />
@@ -96,24 +96,6 @@
                     app:layout_constraintTop_toBottomOf="@+id/textView4"
                     tools:text="10/10" />
 
-                <TextView
-                    android:id="@+id/textView6"
-                    style="@style/param_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/duration"
-                    app:layout_constraintStart_toStartOf="@+id/vote_average_text_view"
-                    app:layout_constraintTop_toBottomOf="@+id/vote_average_text_view" />
-
-                <TextView
-                    android:id="@+id/duration_text_view"
-                    style="@style/element_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    app:layout_constraintStart_toStartOf="@+id/textView6"
-                    app:layout_constraintTop_toBottomOf="@+id/textView6"
-                    tools:text="200 min" />
 
                 <TextView
                     android:id="@+id/overview_text_view"
@@ -155,16 +137,16 @@
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/param_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/trailers"
-                        style="@style/param_title" />
+                        android:text="@string/trailers" />
 
                     <android.support.v7.widget.RecyclerView
+                        android:id="@+id/trailers_recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:id="@+id/trailers_recycler_view"></android.support.v7.widget.RecyclerView>
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
 
                 <View
@@ -179,16 +161,16 @@
                     android:orientation="vertical">
 
                     <TextView
+                        style="@style/param_title"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="@string/reviews"
-                        style="@style/param_title" />
+                        android:text="@string/reviews" />
 
                     <android.support.v7.widget.RecyclerView
+                        android:id="@+id/reviews_recycler_view"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:layout_marginTop="2dp"
-                        android:id="@+id/reviews_recycler_view"></android.support.v7.widget.RecyclerView>
+                        android:layout_marginTop="2dp" />
                 </LinearLayout>
 
             </LinearLayout>

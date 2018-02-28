@@ -32,6 +32,10 @@ public class FilmsContract {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FILM).build();
 
+        public static Uri buildUriWithId(int id) {
+            return CONTENT_URI.buildUpon().appendPath(String.valueOf(id)).build();
+        }
+
         public static final String TABLE_NAME = "films";
 
         public static final String TITLE = "title";
@@ -55,6 +59,10 @@ public class FilmsContract {
 
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FILM_REVIEWS).build();
 
+        public static Uri buildUriWithFilmId(int id) {
+            return CONTENT_URI.buildUpon().appendPath(PATH_FILM).appendPath(String.valueOf(id)).build();
+        }
+
         public static final String TABLE_NAME = "reviews";
         public static final String REVIEW = "review";
         public static final String AUTHOR = "author";
@@ -63,6 +71,10 @@ public class FilmsContract {
 
     public static final class VideosEntry implements BaseColumns {
         public static final Uri CONTENT_URI = BASE_CONTENT_URI.buildUpon().appendPath(PATH_FILM_TRAILERS).build();
+
+        public static Uri buildUriWithFilmId(int id) {
+            return CONTENT_URI.buildUpon().appendPath(PATH_FILM).appendPath(String.valueOf(id)).build();
+        }
 
         public static final String TABLE_NAME = "trailers";
         public static final String KEY = "key";
