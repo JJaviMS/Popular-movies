@@ -33,4 +33,8 @@
     <string name="overview">Overview:</string>
     <string name="trailers">Trailers</string>
     <string name="reviews">Reviews</string>
+
+
+    <string name="value_over_10">%1$s/10</string>
+    <string name="error_url">Error with the video URL</string>
 </resources>

@@ -1,28 +1,41 @@
 package com.example.jjavims.popularmovies;
 
-import android.app.LoaderManager;
-import android.content.CursorLoader;
+import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
-import android.content.Loader;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.AsyncTaskLoader;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.example.jjavims.popularmovies.data.FilmsContract;
+import com.example.jjavims.popularmovies.utils.JSONUtils;
+import com.example.jjavims.popularmovies.utils.NetworkUtils;
+
+import org.json.JSONException;
+
+import java.net.URL;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
 
 
-public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks {
+public class DetailActivity extends AppCompatActivity implements LoaderManager.LoaderCallbacks, VideosAdapter.VideosAdapterListener {
     @BindView(R.id.poster_detail)
-    ImageView posterIv;
+    ImageView mPosterIv;
     @BindView(R.id.title_text_view)
-    TextView titleTv;
+    TextView mTitleTv;
     @BindView(R.id.trailers_recycler_view)
     RecyclerView mTrailersRecyclerView;
     @BindView(R.id.reviews_recycler_view)
@@ -70,8 +83,14 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     private final int FILM_LOADER_ID = 366;
     private final int TRAILERS_LOADER_ID = 367;
     private final int REVIEWS_LOADER_ID = 368;
-    private final int REVIEWS_FROM_SERVER = 369;
-    private final int TRAILERS_FROM_SERVER = 370;
+    private final int REVIEWS_FROM_SERVER_LOADER_ID = 369;
+    private final int TRAILERS_FROM_SERVER_LOADER_ID = 370;
+
+    private VideosAdapter mVideosAdapter;
+
+
+    private boolean fetchedReviews = false;
+    private boolean fetchedTrailers = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,21 +99,23 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         ButterKnife.bind(this);
         Intent intentWhichStartedActivity = getIntent();
         if (intentWhichStartedActivity != null) {
-            Bundle extras = intentWhichStartedActivity.getExtras();
-            if (extras != null) {
-                if (extras.containsKey(MainActivity.FILM_URI)) {
-                    mUri = intentWhichStartedActivity.getData();
-                    if (mUri != null) {
-                        id = Integer.valueOf(mUri.getLastPathSegment());
-                    }
-                }
+            mUri = intentWhichStartedActivity.getData();
+            if (mUri != null) {
+                id = Integer.valueOf(mUri.getLastPathSegment());
             }
-
         }
-        Glide.with(this).load("http://image.tmdb.org/t/p/w185/sM33SANp9z6rXW8Itn7NnG1GOEs.jpg").into(posterIv);
         if (mUri == null)
             throw new RuntimeException("Invalid URI");
-        //TODO Here
+
+        mVideosAdapter = new VideosAdapter(this, this);
+        mReviewsRecyclerView.setAdapter(mVideosAdapter);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        mReviewsRecyclerView.setLayoutManager(layoutManager);
+
+        getSupportLoaderManager().initLoader(FILM_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(TRAILERS_LOADER_ID, null, this);
+        getSupportLoaderManager().initLoader(REVIEWS_LOADER_ID, null, this);
+
     }
 
     @Override
@@ -104,21 +125,151 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
                 return new CursorLoader(this, mUri, FILM_PROJECTION, null, null, null);
             }
             case REVIEWS_LOADER_ID: {
-                return new CursorLoader(this, mUri, REVIEW_PROJECTION, null, null, null);
+                return new CursorLoader(this, FilmsContract.ReviewEntry.buildUriWithFilmId(id), REVIEW_PROJECTION, null, null, null);
             }
             case TRAILERS_LOADER_ID: {
-                return new CursorLoader(this, mUri, VIDEOS_PROJECTION, null, null, null);
+                return new CursorLoader(this, FilmsContract.VideosEntry.buildUriWithFilmId(id), VIDEOS_PROJECTION, null, null, null);
             }
+            case TRAILERS_FROM_SERVER_LOADER_ID: {
+                return new VideosAsyncTask(this, id);
+            }
+            case REVIEWS_FROM_SERVER_LOADER_ID: {
+                return new ReviewsAsyncTask(this, id);
+            }
+            default:
+                throw new RuntimeException("Loader not implemented");
         }
     }
 
     @Override
     public void onLoadFinished(Loader loader, Object o) {
-
+        switch (loader.getId()) {
+            case FILM_LOADER_ID:
+                setData((Cursor) o);
+                break;
+            case REVIEWS_LOADER_ID: {
+                Cursor cursor = (Cursor) o;
+                if ((cursor == null || cursor.getCount() == 0)) {
+                    if (NetworkUtils.checkInternetStatus(this) && !fetchedReviews) {
+                        fetchedReviews = true;
+                        getSupportLoaderManager().restartLoader(REVIEWS_FROM_SERVER_LOADER_ID, null, this);
+                    } else {
+                        hydeReviews();
+                    }
+                } else {
+                    //TODO Here change
+                }
+                break;
+            }
+            case TRAILERS_LOADER_ID: {
+                Cursor cursor = (Cursor) o;
+                if ((cursor == null || cursor.getCount() == 0)) {
+                    if (NetworkUtils.checkInternetStatus(this) && !fetchedTrailers) {
+                        fetchedTrailers = true;
+                        getSupportLoaderManager().restartLoader(TRAILERS_FROM_SERVER_LOADER_ID, null, this);
+                    } else {
+                        hydeFilms();
+                    }
+                } else {
+                    mVideosAdapter.setAdapter(cursor);
+                }
+                break;
+            }
+            case TRAILERS_FROM_SERVER_LOADER_ID: {
+                ContentValues[] cv = (ContentValues[]) o;
+                Uri uri = FilmsContract.FilmEntry.CONTENT_URI;
+                getContentResolver().bulkInsert(uri, cv);
+                getSupportLoaderManager().restartLoader(TRAILERS_LOADER_ID, null, this);
+                break;
+            }
+            case REVIEWS_FROM_SERVER_LOADER_ID: {
+                ContentValues[] cv = (ContentValues[]) o;
+                Uri uri = FilmsContract.ReviewEntry.CONTENT_URI;
+                getContentResolver().bulkInsert(uri, cv);
+                getSupportLoaderManager().restartLoader(TRAILERS_LOADER_ID, null, this);
+                break;
+            }
+        }
     }
 
     @Override
     public void onLoaderReset(Loader loader) {
 
+    }
+
+    @Override
+    public void onClick(String key) {
+        URL url = NetworkUtils.getVideoUrl(key);
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        if (url != null) {
+            intent.setData(Uri.parse(url.toString()));
+            startActivity(intent);
+        } else {
+            Toast.makeText(this, R.string.error_url, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+
+    private static class VideosAsyncTask extends AsyncTaskLoader<ContentValues[]> {
+        private int mId;
+
+        VideosAsyncTask(Context context, int id) {
+            super(context);
+            mId = id;
+
+        }
+
+        @Override
+        public ContentValues[] loadInBackground() {
+            try {
+                return JSONUtils.parseVideosJSON(NetworkUtils.getVideosServerResponse(getContext(), mId));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+
+        @Override
+        protected void onStartLoading() {
+            super.onStartLoading();
+            forceLoad();
+        }
+    }
+
+    private static class ReviewsAsyncTask extends AsyncTaskLoader<ContentValues[]> {
+        private int mId;
+
+        ReviewsAsyncTask(Context context, int id) {
+            super(context);
+            mId = id;
+        }
+
+        @Override
+        public ContentValues[] loadInBackground() {
+            try {
+                return JSONUtils.parseReviewsJSON(NetworkUtils.getReviewsServerResponse(getContext(), mId));
+            } catch (JSONException e) {
+                e.printStackTrace();
+                return null;
+            }
+        }
+    }
+
+    private void setData(Cursor cursor) {
+        cursor.moveToFirst();
+        mDateTv.setText(cursor.getString(INDEX_FILM_RELEASE_DATE));
+        mOverviewTv.setText(cursor.getString(INDEX_FILM_SYNOPSIS));
+        mTitleTv.setText(cursor.getString(INDEX_FILM_TITLE));
+        mVoteAverageTv.setText(getString(R.string.value_over_10, cursor.getString(INDEX_FILM_VOTE_AVERAGE)));
+        Glide.with(this).load(NetworkUtils.getImageURL(cursor.getString(INDEX_FILM_POSTER_PATH))).into(mPosterIv);
+
+    }
+
+    private void hydeReviews() {
+        mReviewsRecyclerView.setVisibility(View.GONE);
+    }
+
+    private void hydeFilms() {
+        mTrailersRecyclerView.setVisibility(View.GONE);
     }
 }

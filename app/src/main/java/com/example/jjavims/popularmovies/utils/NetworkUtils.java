@@ -4,6 +4,7 @@ import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.Uri;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.example.jjavims.popularmovies.BuildConfig;
@@ -35,6 +36,13 @@ public final class NetworkUtils {
     private static final String SIZE = "w185";
 
     private static final String MY_API_KEY = BuildConfig.MOVIES_API_KEY;
+
+    private static final String VIDEOS_PATH = "videos";
+    private static final String REVIEWS_PATH = "reviews";
+
+    private static final String YOUTUBE_URL = "https://www.youtube.com/";
+    private static final String YOUTUBE_PATH_WATCH = "watch";
+    private static final String YOUTUBE_QUERY_VIEDO = "v";
 
     /**
      * Get the JSON data from the server
@@ -71,6 +79,7 @@ public final class NetworkUtils {
      * @param page The page to query
      * @return URL to fetch the data
      */
+    @Nullable
     private static URL buildUrlWithPopular(int page) {
         if (page < 1) throw new IllegalArgumentException();
         Uri movieUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(POPULAR)
@@ -94,6 +103,7 @@ public final class NetworkUtils {
      * @param page The page to query
      * @return URL to fetch the data
      */
+    @Nullable
     private static URL buildUrlWithTopRated(int page) {
         if (page < 1) throw new IllegalArgumentException();
         Uri movieUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(TOP_RATED)
@@ -119,6 +129,7 @@ public final class NetworkUtils {
      * @return The JSON information from the server
      * @throws IOException Related to the network connection
      */
+    @Nullable
     public static String getServerResponse(Context context, String sortOrder, int page) throws IOException {
         Log.v("Internet connection", "Starting connection");
         if (!checkInternetStatus(context))
@@ -162,5 +173,96 @@ public final class NetworkUtils {
         }
         return status != null && status.isConnectedOrConnecting();
     }
+
+    /**
+     * Create the URL to get reviews from the server
+     *
+     * @param filmId The id that the film has on the movie database
+     * @return The URL to get the reviews
+     */
+    @Nullable
+    private static URL getReviewURL(int filmId) {
+        Uri reviewsUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(String.valueOf(filmId))
+                .appendPath(REVIEWS_PATH).appendQueryParameter(API_KEY, MY_API_KEY).build();
+
+        try {
+            URL url = new URL(reviewsUri.toString());
+            Log.v("URL", url.toString());
+            return url;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Returns the reviews from the server
+     *
+     * @param context The context where the method is called
+     * @param filmId  The ID of the film on the movie database which you want to fetch the data
+     * @return The JSON with the reviews information
+     */
+    @Nullable
+    public static String getReviewsServerResponse(Context context, int filmId) {
+        if (!checkInternetStatus(context)) return null;
+
+        URL url = getReviewURL(filmId);
+        if (url == null) return null;
+        try {
+            return getHttpResponse(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    /**
+     * Returns the URL to fetch the trailers from a movie
+     *
+     * @param filmId The id that the film has on the movie database
+     * @return The URL to fetch the data
+     */
+    @Nullable
+    private static URL getTrailersURL(int filmId) {
+        Uri reviewsUri = Uri.parse(MOVIES_URL).buildUpon().appendPath(MOVIE_PATH).appendPath(String.valueOf(filmId))
+                .appendPath(VIDEOS_PATH).appendQueryParameter(API_KEY, MY_API_KEY).build();
+
+        try {
+            URL url = new URL(reviewsUri.toString());
+            Log.v("URL", url.toString());
+            return url;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public static String getVideosServerResponse(Context context, int filmId) {
+        if (!checkInternetStatus(context)) return null;
+
+        URL url = getTrailersURL(filmId);
+        if (url == null) return null;
+        try {
+            return getHttpResponse(url);
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    @Nullable
+    public static URL getVideoUrl(String key) {
+        Uri uri = Uri.parse(YOUTUBE_URL).buildUpon().appendPath(YOUTUBE_PATH_WATCH).appendQueryParameter(YOUTUBE_QUERY_VIEDO, key).build();
+        try {
+            URL url = new URL(uri.toString());
+            Log.v("Youtube URL", url.toString());
+            return url;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
 }

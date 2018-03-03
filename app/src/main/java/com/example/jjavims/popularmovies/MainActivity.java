@@ -195,7 +195,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
     public void onClick(int id) {
         Intent intent = new Intent(this, DetailActivity.class);
         Uri uri = FilmsContract.FilmEntry.buildUriWithId(id);
-        intent.putExtra(FILM_URI, uri);
+        intent.setData(uri);
         startActivity(intent);
     }
 
@@ -246,7 +246,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getContext());
                 int page = sharedPreferences.getInt(getContext().getString(R.string.page_shared_pref), 1);
                 String response =
-                        NetworkUtils.getServerResponse(getContext(), MoviesPrefSync.getSort(getContext()), page);//TODO Actualizar esto
+                        NetworkUtils.getServerResponse(getContext(), MoviesPrefSync.getSort(getContext()), page);
                 SharedPreferences.Editor editor = sharedPreferences.edit();
                 page++;
                 editor.putInt(getContext().getString(R.string.page_shared_pref), page);
@@ -259,7 +259,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 } else if (sortType.equals(getContext().getString(R.string.pref_sort_top_rated))) {
                     sort = FilmsContract.SORT_PARAM_HIGH_RATE;
                 }
-                return JSONUtils.getFilmJSON(response, sort);
+                return JSONUtils.parseFilmJSON(response, sort);
 
             } catch (IOException | JSONException e) {
                 e.printStackTrace();
