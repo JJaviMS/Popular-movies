@@ -35,7 +35,7 @@ public class FilmsProvider extends ContentProvider {
     public static final int CODE_REVIEWS_MOVIE_ID = 302;
 
 
-    private static UriMatcher sUriMatcher = buildURiMatcher();
+    private static final UriMatcher sUriMatcher = buildURiMatcher();
     private FilmDBHelper mFilmDBHelper;
 
     public static UriMatcher buildURiMatcher() {
@@ -180,6 +180,7 @@ public class FilmsProvider extends ContentProvider {
                         }
                     }
                     db.setTransactionSuccessful();
+                    Log.v("Bulk insert", "Inserted " + rowsCreated + "rows");
                 } finally {
                     db.endTransaction();
                 }
@@ -205,6 +206,7 @@ public class FilmsProvider extends ContentProvider {
                         }
                     }
                     db.setTransactionSuccessful();
+                    Log.v("Bulk insert", "Inserted " + rowsCreated + "rows");
                 } finally {
                     db.endTransaction();
                 }
@@ -232,6 +234,7 @@ public class FilmsProvider extends ContentProvider {
                     db.setTransactionSuccessful();
                 } finally {
                     db.endTransaction();
+                    Log.v("Bulk insert", "Inserted " + rowsCreated + "rows");
                 }
                 if (rowsCreated > 0) {
                     Context context = getContext();
@@ -248,4 +251,5 @@ public class FilmsProvider extends ContentProvider {
         }
         return rowsCreated;
     }
+
 }

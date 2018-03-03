@@ -23,10 +23,13 @@
         </activity>
         <activity android:name=".SettingsActivity" />
         <activity android:name=".DetailActivity" />
+
         <provider
-            android:authorities="@string/authority"
             android:name=".data.FilmsProvider"
-            android:exported="false"/>
+            android:authorities="@string/authority"
+            android:exported="false" />
+
+        <activity android:name=".ReviewsActivity"></activity>
     </application>
 
 </manifest>

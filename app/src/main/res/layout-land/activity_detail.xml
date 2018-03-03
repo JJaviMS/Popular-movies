@@ -105,7 +105,8 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toEndOf="@+id/poster_detail"
                     app:layout_constraintTop_toBottomOf="@+id/textView9"
-                    android:paddingRight="5dp"
+                    android:paddingEnd="5dp"
+                    android:paddingStart="5dp"
                     tools:text="An apocalyptic story set in the furthest reaches of our planet, in a stark desert landscape where humanity is broken, and most everyone is crazed fighting for the necessities of life. Within this world exist two rebels on the run who just might be able to restore order. There's Max, a man of action and a man of few words, who seeks peace of mind following the loss of his wife and child in the aftermath of the chaos. And Furiosa, a woman of action and a woman who believes her path to survival may be achieved if she can make it across the desert back to her childhood homeland." />
 
                 <TextView
@@ -118,6 +119,18 @@
                     android:text="@string/overview"
                     app:layout_constraintStart_toEndOf="@+id/poster_detail"
                     app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/favorite_image_view"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_marginStart="8dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/vote_average_text_view"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/textView4"
+                    app:layout_constraintTop_toTopOf="@+id/textView4"
+                    app:srcCompat="@drawable/ic_favorite_border_black_24dp" />
 
             </android.support.constraint.ConstraintLayout>
 
@@ -135,7 +148,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:id="@+id/linear_trailers">
 
                     <TextView
                         style="@style/param_title"
@@ -159,7 +173,8 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:id="@+id/linear_reviews">
 
                     <TextView
                         style="@style/param_title"

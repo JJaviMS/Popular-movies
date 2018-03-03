@@ -17,8 +17,8 @@ import org.json.JSONObject;
 
 public class JSONUtils {
 
-    private static String ID = "id";
-    private static String RESULT = "results";
+    private static final String ID = "id";
+    private static final String RESULT = "results";
 
     /**
      * Parse the JSON information into an Array of ContentValues with all the Objects into the JSON
@@ -85,8 +85,8 @@ public class JSONUtils {
 
                 ContentValues cv = new ContentValues();
                 cv.put(FilmsContract.ReviewEntry.FILM_ID, id);
-                cv.put(FilmsContract.ReviewEntry.AUTHOR, AUTHOR);
-                cv.put(FilmsContract.ReviewEntry.REVIEW, CONTENT);
+                cv.put(FilmsContract.ReviewEntry.AUTHOR, review.getString(AUTHOR));
+                cv.put(FilmsContract.ReviewEntry.REVIEW, review.getString(CONTENT));
                 values[i] = cv;
             }
             return values;

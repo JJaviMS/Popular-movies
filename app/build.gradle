@@ -9,8 +9,9 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        vectorDrawables.useSupportLibrary = true
 
-        buildConfigField ("String","MOVIES_API_KEY",MOVIES_API_KEY)
+        buildConfigField("String", "MOVIES_API_KEY", MOVIES_API_KEY)
     }
     buildTypes {
         release {

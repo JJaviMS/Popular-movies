@@ -20,8 +20,8 @@ import butterknife.ButterKnife;
 public class VideosAdapter extends RecyclerView.Adapter<VideosAdapter.TrailerViewHolder> {
 
     private Cursor mVideos;
-    private Context mContext;
-    private VideosAdapterListener mListener;
+    private final Context mContext;
+    private final VideosAdapterListener mListener;
 
     public VideosAdapter(Context context, VideosAdapterListener listener) {
         mContext = context;

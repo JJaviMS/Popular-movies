@@ -11,6 +11,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
+import com.example.jjavims.popularmovies.data.MoviesPrefSync;
 import com.example.jjavims.popularmovies.utils.NetworkUtils;
 
 import butterknife.BindView;
@@ -31,6 +32,7 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
 
     public interface FilmAdapterListener {
         void onClick(int id);
+
         void bottomReached(int position);
     }
 
@@ -45,9 +47,9 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
     public FilmViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         int layoutId = R.layout.poster_layout;
 
-        View view = LayoutInflater.from(mContext).inflate(layoutId,parent,false);
+        View view = LayoutInflater.from(mContext).inflate(layoutId, parent, false);
         GridLayoutManager.LayoutParams lp = (GridLayoutManager.LayoutParams) view.getLayoutParams();
-        lp.height = parent.getMeasuredHeight()/2;
+        lp.height = parent.getMeasuredHeight() / 2;
         view.setLayoutParams(lp);
         view.setFocusable(true);
         return new FilmViewHolder(view);
@@ -59,15 +61,17 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
         String object = mFilms.getString(MainActivity.INDEX_FILM_MOVIE_PATH);
         String url = NetworkUtils.getImageURL(object);
         Glide.with(mContext).load(url).into(holder.posterImageView);
-        if (position == mFilms.getCount() - 1 && !holder.hasCharged) {
-            mFilmAdapterListener.bottomReached(position);
-            holder.hasCharged = true;
+        if ((!MoviesPrefSync.getSort(mContext).equals(mContext.getString(R.string.pref_sort_favorite)))) {
+            if (position == mFilms.getCount() - 1 && !holder.hasCharged) {
+                mFilmAdapterListener.bottomReached(position);
+                holder.hasCharged = true;
+            }
         }
     }
 
     @Override
     public int getItemCount() {
-        if (mFilms==null) return 0;
+        if (mFilms == null) return 0;
         else return mFilms.getCount();
     }
 
@@ -79,10 +83,12 @@ public class FilmAdapter extends RecyclerView.Adapter<FilmAdapter.FilmViewHolder
 
     class FilmViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         private boolean hasCharged; //This boolean is to detect if this View has already fetched new data
-        @BindView(R.id.image_poster)ImageView posterImageView;
+        @BindView(R.id.image_poster)
+        ImageView posterImageView;
+
         FilmViewHolder(View itemView) {
             super(itemView);
-            ButterKnife.bind(this,itemView);
+            ButterKnife.bind(this, itemView);
             itemView.setOnClickListener(this);
             hasCharged = false;
 

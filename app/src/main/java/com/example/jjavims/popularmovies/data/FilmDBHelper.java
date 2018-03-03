@@ -14,7 +14,7 @@ public class FilmDBHelper extends SQLiteOpenHelper {
 
     public static final String DATABASE_NAME = "films.db";
 
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 9;
 
 
     public FilmDBHelper(Context context) {
@@ -51,7 +51,8 @@ public class FilmDBHelper extends SQLiteOpenHelper {
                         FilmsContract.VideosEntry.KEY + " TEXT NOT NULL UNIQUE, " +
                         FilmsContract.VideosEntry.FILM_ID + " INTEGER NOT NULL, " +
                         " FOREIGN KEY (" + FilmsContract.VideosEntry.FILM_ID + ") REFERENCES " +
-                        FilmsContract.FilmEntry.TABLE_NAME + " ( " + FilmsContract.FilmEntry._ID + "));";
+                        FilmsContract.FilmEntry.TABLE_NAME + " ( " + FilmsContract.FilmEntry._ID + ") " +
+                        "ON DELETE CASCADE ON UPDATE CASCADE);";
         sqLiteDatabase.execSQL(SQL_CREATE_TRAILERS_TABLE);
 
         final String SQL_CREATE_REVIEWS_TABLE =
@@ -61,7 +62,8 @@ public class FilmDBHelper extends SQLiteOpenHelper {
                         FilmsContract.ReviewEntry.REVIEW + " TEXT NOT NULL, " +
                         FilmsContract.ReviewEntry.FILM_ID + " INTEGER NOT NULL, " +
                         " FOREIGN KEY (" + FilmsContract.VideosEntry.FILM_ID + ") REFERENCES " +
-                        FilmsContract.ReviewEntry.TABLE_NAME + " ( " + FilmsContract.FilmEntry._ID + "));";
+                        FilmsContract.FilmEntry.TABLE_NAME + " ( " + FilmsContract.FilmEntry._ID + ") " +
+                        "ON DELETE CASCADE);";
 
         sqLiteDatabase.execSQL(SQL_CREATE_REVIEWS_TABLE);
 
