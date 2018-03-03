@@ -31,7 +31,8 @@
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:id="@+id/activity_review_scroll_view">
 
         <TextView
             android:id="@+id/review_text_view"

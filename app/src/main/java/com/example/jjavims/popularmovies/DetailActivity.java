@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.CursorLoader;
@@ -131,6 +132,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
     public static String FILM_NAME_INTENT_KEY = "film";
     public static String FILM_REVIEW_INTENT_KEY = "review";
 
+    private LinearLayoutManager layoutManagerReviews;
+    private LinearLayoutManager layoutManagerVideos;
+
+    private final String LINEAR_LAYOUT_MANAGER_REVIEW_KEY = "review";
+    private final String LINEAR_LAYOUT_MANAGER_VIDEOS_KEY = "videos";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -149,11 +155,11 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
 
         mVideosAdapter = new VideosAdapter(this, this);
         mTrailersRecyclerView.setAdapter(mVideosAdapter);
-        LinearLayoutManager layoutManagerReviews = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        layoutManagerReviews = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mReviewsRecyclerView.setLayoutManager(layoutManagerReviews);
         mReviewsAdapter = new ReviewsAdapter(this, this);
         mReviewsRecyclerView.setAdapter(mReviewsAdapter);
-        LinearLayoutManager layoutManagerVideos = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
+        layoutManagerVideos = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         mTrailersRecyclerView.setLayoutManager(layoutManagerVideos);
         mTrailersRecyclerView.addItemDecoration(new DividerItemDecoration(this, layoutManagerVideos.getOrientation()));
 
@@ -445,4 +451,25 @@ public class DetailActivity extends AppCompatActivity implements LoaderManager.L
         }
         return super.onOptionsItemSelected(item);
     }
+
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        Parcelable reviewManager = layoutManagerReviews.onSaveInstanceState();
+        Parcelable videosManager = layoutManagerVideos.onSaveInstanceState();
+
+        outState.putParcelable(LINEAR_LAYOUT_MANAGER_REVIEW_KEY, reviewManager);
+        outState.putParcelable(LINEAR_LAYOUT_MANAGER_VIDEOS_KEY, videosManager);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        layoutManagerReviews.onRestoreInstanceState(savedInstanceState.getParcelable(LINEAR_LAYOUT_MANAGER_REVIEW_KEY));
+        layoutManagerVideos.onRestoreInstanceState(savedInstanceState.getParcelable(LINEAR_LAYOUT_MANAGER_VIDEOS_KEY));
+    }
+
 }

@@ -76,6 +76,9 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     public static boolean needsUpdate = false;
 
+    private GridLayoutManager gridLayoutManager;
+    private String GRID_LAYOUT_STATE = "grid";
+
     @Override
     protected void onResume() {
         super.onResume();
@@ -95,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         getResources().getConfiguration();
         int span = orientation == Configuration.ORIENTATION_PORTRAIT ? 2 : 6;
 
-        GridLayoutManager gridLayoutManager = new GridLayoutManager(this, span, GridLayoutManager.VERTICAL, false);
+        gridLayoutManager = new GridLayoutManager(this, span, GridLayoutManager.VERTICAL, false);
 
         mRecyclerView.setLayoutManager(gridLayoutManager);
         mFilmAdapter = new FilmAdapter(this, this);
@@ -300,5 +303,17 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
 
     }
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
 
+        outState.putParcelable(GRID_LAYOUT_STATE, gridLayoutManager.onSaveInstanceState());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        gridLayoutManager.onRestoreInstanceState(savedInstanceState.getParcelable(GRID_LAYOUT_STATE));
+    }
 }
